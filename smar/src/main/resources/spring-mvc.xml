@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans.xsd   
+          http://www.springframework.org/schema/aop
+          http://www.springframework.org/schema/aop/spring-aop.xsd
+          http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+	 	 http://www.springframework.org/schema/mvc
+	 	 http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!--手工配置，诸如css,image等静态资源不通过spring-->
+    <!--<mvc:resources location="/css/" mapping="/css/**"></mvc:resources>-->
+    <!--<mvc:resources location="/frame/" mapping="/frame/**"></mvc:resources>-->
+    <!--<mvc:resources location="/images/" mapping="/images/**"></mvc:resources>-->
+    <!--<mvc:resources location="/js/" mapping="/js/**"></mvc:resources>-->
+    <!--<mvc:resources location="/process-editor/" mapping="/process-editor/**"></mvc:resources>-->
+    <!--<mvc:resources location="/resource/" mapping="/resource/**"></mvc:resources>-->
+    <!--<mvc:resources location="/manuals/" mapping="/manuals/**"></mvc:resources>-->
+    <!--<mvc:resources location="/demo.html" mapping="/demo.html"></mvc:resources>-->
+    <!--<mvc:resources location="/favicon.ico" mapping="/favicon.ico"></mvc:resources>-->
+    <!--<mvc:resources location="/index.jsp" mapping="/index.jsp"></mvc:resources>-->
+    <mvc:resources location="/login.jsp" mapping="/login.jsp"></mvc:resources>
+    <!-- AOP自动注解功能 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <bean id="logAspect" class="com.huaxun.smart.log.LogOperationAspect"></bean>
+    <!--注解驱动-->
+    <mvc:annotation-driven/>
+    <!--自动配置，诸如css,image等静态资源不通过spring-->
+    <mvc:default-servlet-handler />
+    <!--mvc层只需要自动诸如controller-->
+    <context:component-scan base-package="com.huaxun.smart.controller">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"></context:include-filter>
+    </context:component-scan>
+    <context:component-scan base-package="com.huaxun.smart.log"></context:component-scan>
+
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass"
+                  value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/views/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+    <!--<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">-->
+        <!--<property name="messageConverters">-->
+            <!--<list>-->
+                <!--<bean class="org.springframework.http.converter.StringHttpMessageConverter">-->
+                    <!--<property name="supportedMediaTypes">-->
+                        <!--<list>-->
+                            <!--<value>text/plain;charset=GBK</value>-->
+                            <!--<value>application/json;charset=UTF-8</value>-->
+                        <!--</list>-->
+                    <!--</property>-->
+                <!--</bean>-->
+                <!--<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">-->
+                    <!--<property name="supportedMediaTypes">-->
+                        <!--<list>-->
+                            <!--<value>text/plain;charset=GBK</value>-->
+                            <!--<value>application/json;charset=UTF-8</value>-->
+                        <!--</list>-->
+                    <!--</property>-->
+                <!--</bean>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
+    <!--&lt;!&ndash;当路径为"/"时，自动跳转到登录页面&ndash;&gt;-->
+    <mvc:view-controller path="/" view-name="redirect:login"/>
+
+    <!--异常处理-->
+    <bean
+            class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.apache.shiro.authz.UnauthorizedException">
+                    redirect:/unauthorized
+                </prop>
+                <prop key="org.apache.shiro.authz.UnauthenticatedException">
+                    redirect:/unauthenticated
+                </prop>
+            </props>
+        </property>
+    </bean>
+</beans>
